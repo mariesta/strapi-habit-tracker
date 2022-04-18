@@ -26,7 +26,7 @@ export default function Habits({type}) {
 
   return(
     <Grid item>
-      <Typography variant="h5" gutterBottom component="div">
+      <Typography variant="h6" gutterBottom component="div">
         {type.replace(/^\w/, (c) => c.toUpperCase())} routine
       </Typography>
       <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
