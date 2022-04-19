@@ -1,4 +1,6 @@
 import * as React from 'react';
+import axios from "axios";
+import * as qs from 'qs'
 
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
@@ -11,24 +13,59 @@ import ListItemText from '@mui/material/ListItemText';
 
 import Checkbox from '@mui/material/Checkbox';
 
-export default function Habits({type}) {
+export default function Habits({type, calendarDate}) {
+  const [habits, setHabits] = React.useState([]);
 
-  const handleToggle = (value) => () => {};
+  React.useEffect(() => {
+    const query = qs.stringify({
+      filters: {
+        type: {
+          $eq: type,
+        },
+      },
+    }, {
+      encodeValuesOnly: true,
+    });
+
+    axios.get(`http://localhost:1337/api/habits?${query}`)
+    .then((response) =>{
+      setHabits(response.data.data)
+    })
+    .catch((error) => console.log(error))
+  }, [calendarDate])
+
+  const completeHabit = (habitId) => () => {
+    axios
+      .post('http://localhost:1337/api/habit-logs', {
+        data: {
+          habit: habitId,
+          completionDate: calendarDate
+        }
+      })
+      .then((response) => {
+        console.log(response)
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   return(
     <Grid item>
       <Typography variant="h6" gutterBottom component="div">
         {type.replace(/^\w/, (c) => c.toUpperCase())} routine
       </Typography>
-      <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-      {[0, 1, 2, 3].map((value) => {
-        const labelId = `checkbox-list-label-${value}`;
+      <List sx={{ width: '100%' }}>
+      {habits.map((habit) => {
+        const { id, attributes } = habit
+        const { name } = attributes
+        const labelId = `checkbox-list-label-${id}`;
         return (
           <ListItem
-            key={value}
+            key={id}
             disablePadding
           >
-            <ListItemButton role={undefined} onClick={handleToggle(value)} dense>
+            <ListItemButton role={undefined} onClick={completeHabit(id)} dense>
               <ListItemIcon>
                 <Checkbox
                   edge="start"
@@ -38,7 +75,7 @@ export default function Habits({type}) {
                   inputProps={{ 'aria-labelledby': labelId }}
                 />
               </ListItemIcon>
-              <ListItemText id={labelId} primary={`Line item ${value + 1}`} />
+              <ListItemText id={labelId} primary={name} />
             </ListItemButton>
           </ListItem>
         );

@@ -13,9 +13,9 @@ export default function Habits({calendarDate}) {
       {format(calendarDate, "eeee, d LLLL yyyy")}
     </Typography>
     <Grid container spacing={2} direction="column">
-      <HabitsList type="morning" />
-      <HabitsList type="afternoon" />
-      <HabitsList type="evening" />
+      <HabitsList type="morning" calendarDate={calendarDate}/>
+      <HabitsList type="afternoon" calendarDate={calendarDate}/>
+      <HabitsList type="evening" calendarDate={calendarDate}/>
     </Grid>
   </>
   )
