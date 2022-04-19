@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { format } from 'date-fns'
 
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
@@ -34,14 +33,7 @@ export default function App() {
           <Calendar calendarDate={calendarDate} setCalendarDate={setCalendarDate} />
         </Grid>
         {/* Habits Table */}
-        <Typography variant="h5" gutterBottom component="div">
-          {format(calendarDate, "eeee, d LLLL yyyy")}
-        </Typography>
-        <Grid container spacing={2} direction="column">
-          <Habits type="morning" />
-          <Habits type="afternoon" />
-          <Habits type="evening" />
-        </Grid>
+        <Habits calendarDate={calendarDate} />
       </Grid>
     </Container>
   );
