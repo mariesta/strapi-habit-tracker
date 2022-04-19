@@ -1,6 +1,8 @@
 import * as React from 'react';
+import axios from "axios";
 
 import Grid from '@mui/material/Grid';
+import Alert from '@mui/material/Alert';
 
 import FormControl from '@mui/material/FormControl';
 import TextField from '@mui/material/TextField';
@@ -10,17 +12,40 @@ import InputLabel from '@mui/material/InputLabel';
 import Button from '@mui/material/Button';
 
 export default function CreateHabitForm() {
+  const [name, setName] = React.useState("");
   const [type, setType] = React.useState("morning");
+  const [alert, setAlert] = React.useState({message: null, type: null});
 
-  const handleTypeChange = (event) => {
-    setType(event.target.value)
+  const handleSubmit = () => {
+    setAlert({ message: null, type: null})
+    axios
+      .post('http://localhost:1337/api/habits', {
+        data: {
+          name,
+          type
+        }
+      })
+      .then((response) => {
+        setName("")
+        setType("")
+        setAlert({ message: 'Habit created', type: 'success'})
+      })
+      .catch((error) => {
+        console.log(error);
+        setAlert({ message: 'An error occurred', type: 'error'})
+      });
   }
-
   return(
     <Grid container spacing={2} direction="column">
+      {alert.type && <Alert severity={alert.type}>{alert.message}</Alert>}
       <Grid item>
         <FormControl fullWidth>
-          <TextField id="standard-basic" label="Name" variant="outlined" />
+          <TextField
+            id="habit-name"
+            label="Name"
+            variant="outlined"
+            value={name}
+            onChange={(event) => setName(event.target.value)}/>
         </FormControl>
       </Grid>
       <Grid item>
@@ -32,7 +57,7 @@ export default function CreateHabitForm() {
             value={type}
             label="Type"
             autoWidth
-            onChange={handleTypeChange}
+            onChange={(event) => setType(event.target.value)}
           >
             <MenuItem value="morning">Morning</MenuItem>
             <MenuItem value="afternoon">Afternoon</MenuItem>
@@ -41,7 +66,7 @@ export default function CreateHabitForm() {
         </FormControl>
       </Grid>
       <Grid item>
-        <Button variant="contained">Add</Button>
+        <Button variant="contained" onClick={handleSubmit}>Add</Button>
       </Grid>
     </Grid>
   )
