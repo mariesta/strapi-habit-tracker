@@ -1,6 +1,7 @@
 import * as React from 'react';
 import axios from "axios";
 import * as qs from 'qs'
+import { format } from 'date-fns';
 
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
@@ -17,22 +18,16 @@ export default function Habits({type, calendarDate}) {
   const [habits, setHabits] = React.useState([]);
 
   React.useEffect(() => {
-    const query = qs.stringify({
-      filters: {
-        type: {
-          $eq: type,
-        },
-      },
-    }, {
-      encodeValuesOnly: true,
-    });
+    fetchData()
+  }, [calendarDate])
 
-    axios.get(`http://localhost:1337/api/habits?${query}`)
+  const fetchData = () => {
+    axios.get(`http://localhost:1337/api/get-habits-with-logs?calendarDate=${format(calendarDate, "yyyy-MM-dd")}&type=${type}`)
     .then((response) =>{
-      setHabits(response.data.data)
+      setHabits(response.data)
     })
     .catch((error) => console.log(error))
-  }, [calendarDate])
+  }
 
   const completeHabit = (habitId) => () => {
     axios
@@ -43,7 +38,7 @@ export default function Habits({type, calendarDate}) {
         }
       })
       .then((response) => {
-        console.log(response)
+        fetchData()
       })
       .catch((error) => {
         console.log(error);
@@ -56,9 +51,8 @@ export default function Habits({type, calendarDate}) {
         {type.replace(/^\w/, (c) => c.toUpperCase())} routine
       </Typography>
       <List sx={{ width: '100%' }}>
-      {habits.map((habit) => {
-        const { id, attributes } = habit
-        const { name } = attributes
+      {habits.length > 0 && habits.map((habit) => {
+        const { id, name, completed } = habit
         const labelId = `checkbox-list-label-${id}`;
         return (
           <ListItem
@@ -69,7 +63,7 @@ export default function Habits({type, calendarDate}) {
               <ListItemIcon>
                 <Checkbox
                   edge="start"
-                  checked={false}
+                  checked={completed}
                   tabIndex={-1}
                   disableRipple
                   inputProps={{ 'aria-labelledby': labelId }}
