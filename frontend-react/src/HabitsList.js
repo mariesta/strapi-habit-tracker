@@ -47,9 +47,11 @@ export default function Habits({type, calendarDate}) {
 
   return(
     <Grid item>
+    {/*  Title of the section aka Morning routine */}
       <Typography variant="h6" gutterBottom component="div">
         {type.replace(/^\w/, (c) => c.toUpperCase())} routine
       </Typography>
+      {/* Whole list */}
       <List sx={{ width: '100%' }}>
       {habits.length > 0 && habits.map((habit) => {
         const { id, name, completed } = habit
